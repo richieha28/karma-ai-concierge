@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Karma AI Concierge — Live weather intelligence and AI-powered resort recommendations for Karma Group." />
+  <title>Karma AI Concierge</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <!-- Ambient gold glow -->
+  <div class="ambient" aria-hidden="true">
+    <div class="ambient__orb ambient__orb--1"></div>
+    <div class="ambient__orb ambient__orb--2"></div>
+  </div>
+
+  <div class="app" id="main-content">
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="header reveal">
+      <div class="header__brand">
+        <div class="header__logo" aria-hidden="true">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="18" stroke="#D4AF37" stroke-width="1" opacity="0.5"/>
+            <path d="M20 8 L23 18 L34 20 L23 22 L20 32 L17 22 L6 20 L17 18 Z" fill="#D4AF37" opacity="0.8"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="header__title">Karma AI Concierge</h1>
+          <p class="header__tagline">Live weather · Intelligent recommendations</p>
+        </div>
+      </div>
+      <div class="header__badge">
+        <span class="header__pulse" aria-hidden="true"></span>
+        Powered by OpenWeather &amp; Google Gemini
+      </div>
+    </header>
+
+    <!-- ==================== CONTROLS ==================== -->
+    <section class="controls glass-card reveal" aria-label="Resort location controls">
+      <div class="controls__field">
+        <label class="controls__label" for="citySelect">Resort destination</label>
+        <select class="controls__select" id="citySelect">
+          <option value="Bali, ID">Bali — Karma Beach</option>
+          <option value="Goa, IN">Goa — Karma Royal</option>
+          <option value="Nha Trang, VN">Vietnam — Karma Cay Tre</option>
+          <option value="Phuket, TH">Phuket — Karma Royal Boat Lagoon</option>
+          <option value="Halkidiki, GR">Greece — Karma Halkidiki</option>
+        </select>
+      </div>
+      <div class="controls__actions">
+        <button class="btn btn--secondary" id="btnRefreshWeather" type="button">
+          <span class="btn__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </span>
+          Refresh weather
+        </button>
+        <button class="btn btn--primary" id="btnGenerate" type="button" disabled>
+          <span class="btn__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3c4.5 0 8 2.8 8 6.5 0 2.2-1.2 4.2-3.1 5.4L16 21l-4-2-4 2 1.1-6.1C7.2 13.7 6 11.7 6 9.5 6 5.8 9.5 3 14 3H12z"/></svg>
+          </span>
+          Generate AI Recommendation
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== ERROR BANNER ==================== -->
+    <div class="alert alert--error glass-card" id="errorBanner" role="alert" hidden>
+      <span class="alert__icon" aria-hidden="true">!</span>
+      <p class="alert__message" id="errorMessage"></p>
+      <button class="alert__dismiss" id="btnDismissError" type="button" aria-label="Dismiss error">&times;</button>
+    </div>
+
+    <!-- ==================== WEATHER SUMMARY ==================== -->
+    <section class="weather-hero glass-card reveal" id="weatherHero" aria-live="polite">
+      <div class="weather-hero__loading" id="weatherLoading">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Fetching live weather data…</p>
+      </div>
+
+      <div class="weather-hero__content" id="weatherContent" hidden>
+        <div class="weather-hero__main">
+          <p class="weather-hero__city" id="displayCity">—</p>
+          <p class="weather-hero__temp" id="displayTemp">—</p>
+          <p class="weather-hero__condition" id="displayCondition">—</p>
+        </div>
+        <div class="weather-hero__metrics">
+          <div class="metric">
+            <span class="metric__label">Humidity</span>
+            <span class="metric__value" id="displayHumidity">—</span>
+          </div>
+          <div class="metric">
+            <span class="metric__label">Wind speed</span>
+            <span class="metric__value" id="displayWind">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="weather-hero__empty" id="weatherEmpty" hidden>
+        <p>Select a destination and refresh weather to begin.</p>
+      </div>
+    </section>
+
+    <!-- ==================== AI PIPELINE OUTPUT ==================== -->
+    <section class="pipeline reveal" aria-label="AI content pipeline">
+
+      <article class="pipeline__panel glass-card">
+        <header class="pipeline__header">
+          <span class="pipeline__step">01</span>
+          <h2 class="pipeline__title">Raw Weather Data</h2>
+        </header>
+        <div class="pipeline__body">
+          <div class="pipeline__loading" id="rawLoading" hidden>
+            <div class="skeleton skeleton--block"></div>
+            <div class="skeleton skeleton--line"></div>
+            <div class="skeleton skeleton--line skeleton--short"></div>
+          </div>
+          <pre class="pipeline__code" id="rawWeatherOutput" aria-label="Raw weather API response">Waiting for weather data…</pre>
+        </div>
+      </article>
+
+      <article class="pipeline__panel glass-card">
+        <header class="pipeline__header">
+          <span class="pipeline__step">02</span>
+          <h2 class="pipeline__title">Prompt Sent</h2>
+        </header>
+        <div class="pipeline__body">
+          <div class="pipeline__loading" id="promptLoading" hidden>
+            <div class="skeleton skeleton--line"></div>
+            <div class="skeleton skeleton--line"></div>
+            <div class="skeleton skeleton--line skeleton--short"></div>
+          </div>
+          <pre class="pipeline__code pipeline__code--prompt" id="promptOutput" aria-label="Prompt sent to LLM">Prompt will appear after weather is loaded…</pre>
+        </div>
+      </article>
+
+      <article class="pipeline__panel glass-card pipeline__panel--response">
+        <header class="pipeline__header">
+          <span class="pipeline__step">03</span>
+          <h2 class="pipeline__title">AI Response</h2>
+          <span class="pipeline__status" id="aiStatus" hidden>
+            <span class="typing-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+            Concierge is thinking…
+          </span>
+        </header>
+        <div class="pipeline__body">
+          <div class="pipeline__response" id="aiResponse">
+            <p class="pipeline__placeholder">Click <strong>Generate AI Recommendation</strong> to receive personalised activities, packing tips, dining ideas, and resort experiences.</p>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <footer class="footer reveal">
+      <p>Karma AI Concierge · End-to-end AI content pipeline demo</p>
+      <p class="footer__meta">OpenWeather → Prompt Builder → Gemini LLM</p>
+    </footer>
+
+  </div>
+
+  <script src="script.js?v=4"></script>
+</body>
+</html>
